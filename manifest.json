@@ -1,0 +1,26 @@
+{
+  "name": "EPS",      // Nom complet, affiché dans infos
+  "short_name": "EPS",             // Nom sous l'icône sur l'écran d'accueil
+  "start_url": "./index.html",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#1e3a8a",
+  "theme_color": "#4f46e5",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-1024.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
+}
