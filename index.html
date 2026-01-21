@@ -4,81 +4,82 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EPS</title>
+
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: { extend: {} }
+  }
+</script>
+
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#4f46e5">
-<style>
-:root { --bg1:#1e3a8a; --bg2:#2563eb; }
-.light { --bg1:#e0f2fe; --bg2:#bae6fd; }
-body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100vh;color:white; }
-.card { border-radius:1rem; padding:1rem; transition: transform 0.2s, box-shadow 0.2s; display:flex; flex-direction:column; justify-content:space-between; }
-.card:hover { transform:scale(1.03); box-shadow:0 8px 20px rgba(0,0,0,0.3); }
-.card button.open-btn { flex:1; background: linear-gradient(90deg,#4f46e5,#6366f1); color:white; border-radius:0.5rem; padding:0.5rem 1rem; font-weight:bold; transition: background 0.2s; }
-.card button.open-btn:hover { background: linear-gradient(90deg,#6366f1,#4f46e5); }
-.emoji-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:5px; max-height:150px; overflow:auto; margin-bottom:0.5rem; }
-.emoji-grid button { font-size:1.5rem; cursor:pointer; transition:0.2s; }
-.emoji-grid button:hover { transform:scale(1.2); }
-</style>
-<head>
-<link rel="stylesheet" href="darkmode.css">
-  
-<header class="text-center mb-4">
-<h1 class="text-4xl font-bold">EPS</h1>
-<p class="opacity-80">by T.Bourgouin</p>
+
+</head>
+<body class="dark bg-gray-900 text-white min-h-screen">
+
+<!-- HEADER -->
+<header class="text-center mb-4 bg-gray-800 dark:bg-gray-900 p-4 shadow">
+  <h1 class="text-4xl font-bold">EPS</h1>
+  <p class="opacity-80">by T.Bourgouin</p>
 </header>
 
 <!-- CONTROLES -->
 <div class="flex flex-wrap gap-2 justify-center mb-4">
-<button id="themeBtn" class="bg-white text-black px-3 py-1 rounded">🌗 Thème</button>
-<button id="exportBtn" class="bg-white text-black px-3 py-1 rounded">📤 Export</button>
-<label class="bg-white text-black px-3 py-1 rounded cursor-pointer">
-📥 Import<input type="file" hidden id="importInput">
-</label>
+  <button id="themeBtn" class="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white">🌗 Thème</button>
+  <button id="exportBtn" class="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white">📤 Export</button>
+  <label class="px-3 py-1 rounded bg-gray-200 dark:bg-gray-700 text-black dark:text-white cursor-pointer">
+    📥 Import
+    <input type="file" hidden id="importInput">
+  </label>
 </div>
 
-<!-- AJOUT -->
+<!-- FORMULAIRE AJOUT -->
 <div class="grid sm:grid-cols-6 gap-2 mb-2">
-<input id="name" placeholder="Nom" class="p-2 rounded text-black">
-<input id="url" placeholder="Lien" class="p-2 rounded text-black">
-<input id="cat" placeholder="Catégorie" class="p-2 rounded text-black">
-<input id="icon" placeholder="Emoji" class="p-2 rounded text-black" readonly>
-<input id="color" type="color" value="#4f46e5" class="h-10">
-<button id="addBtn" type="button" class="bg-white text-black rounded font-bold mt-2">➕ Ajouter</button>
+  <input id="name" placeholder="Nom" class="p-2 rounded text-black dark:text-white bg-gray-200 dark:bg-gray-700">
+  <input id="url" placeholder="Lien" class="p-2 rounded text-black dark:text-white bg-gray-200 dark:bg-gray-700">
+  <input id="cat" placeholder="Catégorie" class="p-2 rounded text-black dark:text-white bg-gray-200 dark:bg-gray-700">
+  <input id="icon" placeholder="Emoji" class="p-2 rounded text-black dark:text-white bg-gray-200 dark:bg-gray-700" readonly>
+  <input id="color" type="color" value="#4f46e5" class="h-10">
+  <button id="addBtn" type="button" class="bg-blue-500 hover:bg-blue-600 text-white rounded font-bold mt-2">➕ Ajouter</button>
 </div>
 
-<!-- MENU EMOJIS COLLAPSIBLE -->
+<!-- EMOJIS COLLAPSIBLE -->
 <div class="mb-2">
-  <button id="toggleEmoji" class="bg-white text-black px-2 py-1 rounded mb-1">😀 Emojis</button>
-  <div class="emoji-grid hidden" id="emojiGrid"></div>
+  <button id="toggleEmoji" class="bg-gray-200 dark:bg-gray-700 text-black dark:text-white px-2 py-1 rounded mb-1">😀 Emojis</button>
+  <div class="emoji-grid hidden grid grid-cols-6 gap-1 max-h-36 overflow-auto"></div>
 </div>
 
 <!-- FILTRES -->
 <div class="flex gap-2 mb-4">
-<input id="search" placeholder="🔍 Rechercher" class="flex-1 p-2 rounded text-black">
-<select id="filterCat" class="p-2 rounded text-black">
-<option value="">Toutes catégories</option>
-</select>
+  <input id="search" placeholder="🔍 Rechercher" class="flex-1 p-2 rounded text-black dark:text-white bg-gray-200 dark:bg-gray-700">
+  <select id="filterCat" class="p-2 rounded text-black dark:text-white bg-gray-200 dark:bg-gray-700">
+    <option value="">Toutes catégories</option>
+  </select>
 </div>
 
 <!-- CARTES -->
 <div id="apps" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
 
-</div>
-
 <script>
+// =======================
 // THEME
+// =======================
 let theme = localStorage.getItem("theme")||"dark";
-if(theme==="light") document.body.classList.add("light");
+if(theme==="dark") document.body.classList.add("dark");
 document.getElementById("themeBtn").addEventListener("click", () => {
     theme = theme==="dark"?"light":"dark";
-    document.body.classList.toggle("light");
+    document.body.classList.toggle("dark");
     localStorage.setItem("theme", theme);
 });
 
-// DONNÉES
+// =======================
+// DONNEES
+// =======================
 let apps = JSON.parse(localStorage.getItem("hubApps")||"[]");
 
-// Natives simplifiées
 const nativeApps = [
   { name: "Google Drive", url: "https://drive.google.com", icon: "📂", cat: "Native", color: "#34d399" },
   { name: "Google Docs", url: "https://docs.google.com", icon: "📄", cat: "Native", color: "#3b82f6" }
@@ -89,14 +90,17 @@ nativeApps.forEach(n=>{
 });
 if(added) localStorage.setItem("hubApps", JSON.stringify(apps));
 
+// =======================
 // EMOJIS
+// =======================
 const emojis = ["🏃‍♂️","🏃‍♀️","⏱️","📂","📄","🎯","📚","🧭","🔢","⚡","📝","📷","🎵","🌟","🖊️","🗂️","📊","📌","📅","🛠️","🧩","🎒","📓","🗒️","🕹️","🛎️","🧰","🖍️","🎤","🏅","🥇","🥈","🥉","🗑️","💡","🧾","🔎","🔔","📍","🎫","🔗","🖥️","📲"];
-const emojiGrid=document.getElementById("emojiGrid");
+const emojiGrid=document.querySelector(".emoji-grid");
 const iconInput=document.getElementById("icon");
 emojis.forEach(e=>{
   const btn=document.createElement("button");
   btn.innerText=e;
   btn.type="button";
+  btn.className="text-2xl p-1 hover:scale-125 transition-transform";
   btn.addEventListener("click", ()=>{ iconInput.value=e; iconInput.focus(); });
   emojiGrid.appendChild(btn);
 });
@@ -104,7 +108,9 @@ document.getElementById("toggleEmoji").addEventListener("click", ()=>{
   emojiGrid.classList.toggle("hidden");
 });
 
+// =======================
 // AJOUT APP
+// =======================
 document.getElementById("addBtn").addEventListener("click", ()=>{
     const name = document.getElementById("name").value.trim();
     const url = document.getElementById("url").value.trim();
@@ -121,16 +127,18 @@ document.getElementById("addBtn").addEventListener("click", ()=>{
     render();
 });
 
+// =======================
 // RENDER CARTES
+// =======================
 let dragIndex=null;
 function render(){
     const list=document.getElementById("apps");
     const cats=[...new Set(apps.map(a=>a.cat).filter(Boolean))];
     document.getElementById("filterCat").innerHTML='<option value="">Toutes catégories</option>'+cats.map(c=>`<option>${c}</option>`).join("");
-    
+
     const search=document.getElementById("search").value.toLowerCase();
     const filterCat=document.getElementById("filterCat").value;
-    
+
     list.innerHTML="";
     apps
       .filter(a => a.name.toLowerCase().includes(search))
@@ -138,9 +146,9 @@ function render(){
       .sort((a,b)=>b.fav-a.fav)
       .forEach((a,i)=>{
         const card=document.createElement("div");
-        card.className="card p-4 shadow";
+        card.className="card p-4 shadow rounded-lg text-black dark:text-white";
+        card.style.background=a.color; // couleur dynamique
         card.draggable=true;
-        card.style.background=a.color;
         card.ondragstart=()=>dragStart(i);
         card.ondragover=(e)=>e.preventDefault();
         card.ondrop=()=>drop(i);
@@ -150,9 +158,9 @@ function render(){
             <h2 class="text-xl font-bold mb-1">${a.name}</h2>
             <p class="text-sm opacity-80 mb-2">${a.cat||""}</p>
             <div class="flex gap-2">
-                <button class="open-btn">Ouvrir</button>
-                <button class="fav-btn">⭐</button>
-                <button class="del-btn">🗑️</button>
+                <button class="open-btn bg-blue-500 hover:bg-blue-600 text-white rounded px-2 py-1 flex-1">Ouvrir</button>
+                <button class="fav-btn bg-yellow-400 hover:bg-yellow-500 text-black rounded px-2 py-1">⭐</button>
+                <button class="del-btn bg-red-500 hover:bg-red-600 text-white rounded px-2 py-1">🗑️</button>
             </div>
         `;
         list.appendChild(card);
@@ -198,4 +206,3 @@ if('serviceWorker' in navigator){
 </script>
 </body>
 </html>
-
