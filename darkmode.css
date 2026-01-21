@@ -8,7 +8,7 @@ body {
 }
 
 /* === NAVBAR STICKY === */
-header, nav {
+header {
   position: sticky;
   top: 0;
   z-index: 100;
@@ -20,72 +20,71 @@ header, nav {
   box-shadow: 0 2px 6px rgba(0,0,0,0.6);
 }
 
-header h1, nav h1 {
-  color: #E0E0E0;
+header h1 {
   font-size: 1.8rem;
   margin: 0;
+  color: #E0E0E0;
 }
 
-/* Bouton principal dans navbar */
-header button, nav button, .btn-main {
+/* Bouton principal navbar */
+#btnAdd {
   background-color: #4FA1F2;
   color: #fff;
   border: none;
   padding: 0.6rem 1.2rem;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 1rem;
   transition: all 0.2s ease;
 }
 
-header button:hover, nav button:hover, .btn-main:hover {
+#btnAdd:hover {
   background-color: #3A8CD4;
   transform: translateY(-1px);
 }
 
 /* === CONTENEUR PRINCIPAL === */
-main, .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
+#listeEPS {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
   justify-content: center;
+  gap: 1rem;
+  padding: 2rem;
 }
 
-/* === CARTES === */
-.card, .item {
+/* === CARTES / ELEMENTS === */
+.element {
   background-color: #1E1E1E;
   border-radius: 12px;
   padding: 1rem 1.5rem;
-  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
   flex: 1 1 250px;
   max-width: 300px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.4);
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.card:hover, .item:hover {
+.element:hover {
   transform: translateY(-3px);
   box-shadow: 0 10px 18px rgba(0,0,0,0.5);
 }
 
-/* === TITRES ET TEXTES === */
-h2, h3, h4 {
+/* Titres et textes des cartes */
+.element h2 {
   margin: 0 0 0.5rem 0;
   color: #E0E0E0;
 }
 
-p, span, li {
+.element p {
+  margin: 0;
   color: #A0A0A0;
 }
 
-/* === BOUTONS SUR LES CARTES === */
-.card .btn, .item .btn {
+/* Boutons sur les cartes */
+.btn-card {
   align-self: flex-end;
+  margin-top: 1rem;
   background-color: #4FA1F2;
   color: #fff;
   border: none;
@@ -93,23 +92,14 @@ p, span, li {
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
-  margin-top: 1rem;
 }
 
-.card .btn:hover, .item .btn:hover {
+.btn-card:hover {
   background-color: #3A8CD4;
   transform: translateY(-1px);
 }
 
-/* === LISTES / TABLEAUX === */
-ul, ol, table {
-  background-color: #1E1E1E;
-  border-radius: 8px;
-  padding: 1rem;
-  color: #E0E0E0;
-}
-
-/* === INPUT / FORMULAIRES === */
+/* === FORMULAIRES / INPUT === */
 input, select, textarea {
   background-color: #1E1E1E;
   color: #E0E0E0;
@@ -126,14 +116,22 @@ input:focus, select:focus, textarea:focus {
   outline: none;
 }
 
+/* === TABLEAUX / LISTES === */
+ul, ol, table {
+  background-color: #1E1E1E;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #E0E0E0;
+}
+
 /* === RESPONSIVE === */
 @media (max-width: 768px) {
-  main, .container {
+  #listeEPS {
     flex-direction: column;
     align-items: center;
   }
 
-  .card, .item {
+  .element {
     max-width: 90%;
   }
 }
