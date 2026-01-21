@@ -20,7 +20,7 @@ body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100v
 <div class="max-w-[1200px] mx-auto">
 
 <header class="text-center mb-4">
-<h1 class="text-4xl font-bold">EPS</h1>
+<h1 class="text-4xl font-bold">📂 Hub Perso</h1>
 <p class="opacity-80">by T.Bourgouin</p>
 </header>
 
@@ -40,7 +40,7 @@ body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100v
 <input id="cat" placeholder="Catégorie" class="p-2 rounded text-black">
 <input id="icon" placeholder="Emoji" class="p-2 rounded text-black" readonly>
 <input id="color" type="color" value="#4f46e5" class="h-10">
-<button id="addBtn" class="bg-white text-black rounded font-bold">➕ Ajouter</button>
+<button id="addBtn" class="bg-white text-black rounded font-bold mt-2">➕ Ajouter</button>
 </div>
 
 <!-- GRILLE EMOJIS -->
@@ -76,14 +76,16 @@ function toggleTheme(){
 // EMOJIS
 const emojis = ["🏃‍♂️","🏃‍♀️","⏱️","📂","📄","🎯","📚","🧭","🔢","⚡","📝","📷","🎵","🌟","🖊️","🗂️","📊","📌","📅","🛠️","🧩","🎒","📓","🗒️","🕹️","🛎️","🧰","🖍️","🎤","🏅","🥇","🥈","🥉","🗑️","💡","🧾","🔎","🔔","📍","🎫","🔗","🖥️","📲"];
 const emojiGrid=document.getElementById("emojiGrid");
+const iconInput=document.getElementById("icon");
 emojis.forEach(e=>{
   const btn=document.createElement("button");
   btn.innerText=e;
-  btn.onclick=()=>document.getElementById("icon").value=e;
+  btn.type="button";
+  btn.onclick=()=>{ iconInput.value=e; iconInput.focus(); };
   emojiGrid.appendChild(btn);
 });
 
-// APPLIS NATIVES ANDROID
+// APPLIS NATIVES ANDROID / iOS
 const nativeApps = [
   { name: "Google Drive", url: "https://drive.google.com", icon: "📂", cat: "Native", color: "#34d399" },
   { name: "Google Docs", url: "https://docs.google.com", icon: "📄", cat: "Native", color: "#3b82f6" },
@@ -91,38 +93,29 @@ const nativeApps = [
   { name: "Google Maps", url: "geo:0,0?q=", icon: "🗺️", cat: "Native", color: "#10b981" },
   { name: "YouTube", url: "https://youtube.com", icon: "🎬", cat: "Native", color: "#ef4444" }
 ];
-// Ajoute seulement si pas déjà présent
-nativeApps.forEach(n=>{
-  if(!apps.some(a=>a.name===n.name && a.cat==="Native")) apps.push(n);
-});
+nativeApps.forEach(n=>{ if(!apps.some(a=>a.name===n.name && a.cat==="Native")) apps.push(n); });
 
 // SAUVEGARDE
-function save(){ localStorage.setItem("hubApps",JSON.stringify(apps)); render(); }
+function save(){ localStorage.setItem("hubApps", JSON.stringify(apps)); render(); }
 
 // AJOUT APP
-function addApp(){
-  const nameInput=document.getElementById("name");
-  const urlInput=document.getElementById("url");
-  const catInput=document.getElementById("cat");
-  const iconInput=document.getElementById("icon");
-  const colorInput=document.getElementById("color");
-  const app={
-    id:Date.now(),
-    name:nameInput.value.trim(),
-    url:urlInput.value.trim(),
-    cat:catInput.value.trim(),
-    icon:iconInput.value||"🔗",
-    color:colorInput.value,
-    fav:false
-  };
-  if(!app.name||!app.url){ alert("Nom et lien obligatoires"); return; }
-  apps.push(app);
-  save();
-  nameInput.value=urlInput.value=catInput.value=iconInput.value="";
-}
+document.getElementById("addBtn").addEventListener("click", ()=>{
+  const name=document.getElementById("name").value.trim();
+  const url=document.getElementById("url").value.trim();
+  const cat=document.getElementById("cat").value.trim();
+  const icon=iconInput.value||"🔗";
+  const color=document.getElementById("color").value;
 
-// FIX BOUTON AJOUT
-document.getElementById("addBtn").addEventListener("click", addApp);
+  if(!name||!url){ alert("Nom et lien obligatoires"); return; }
+
+  apps.push({id:Date.now(), name, url, cat, icon, color, fav:false});
+  save();
+
+  document.getElementById("name").value="";
+  document.getElementById("url").value="";
+  document.getElementById("cat").value="";
+  iconInput.value="";
+});
 
 // SUPPRIMER / FAVORI / OUVRIR
 function del(id){ 
@@ -181,3 +174,4 @@ function importData(e){ const r=new FileReader(); r.onload=()=>{apps=JSON.parse(
 </script>
 </body>
 </html>
+
