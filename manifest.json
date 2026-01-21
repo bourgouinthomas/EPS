@@ -1,6 +1,6 @@
 {
-  "name": "Hub Perso",
-  "short_name": "Hub",
+  "name": "EPS",
+  "short_name": "EPS",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#1e3a8a",
