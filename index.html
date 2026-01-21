@@ -5,12 +5,16 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EPS</title>
 <script src="https://cdn.tailwindcss.com"></script>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#4f46e5">
 <style>
 :root { --bg1:#1e3a8a; --bg2:#2563eb; }
 .light { --bg1:#e0f2fe; --bg2:#bae6fd; }
 body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100vh;color:white; }
-.card { transition:.2s; cursor:grab; }
-.card:hover { transform:scale(1.03); box-shadow:0 0 15px rgba(0,0,0,0.4); }
+.card { border-radius:1rem; padding:1rem; transition: transform 0.2s, box-shadow 0.2s; display:flex; flex-direction:column; justify-content:space-between; }
+.card:hover { transform:scale(1.03); box-shadow:0 8px 20px rgba(0,0,0,0.3); }
+.card button.open-btn { flex:1; background: linear-gradient(90deg,#4f46e5,#6366f1); color:white; border-radius:0.5rem; padding:0.5rem 1rem; font-weight:bold; transition: background 0.2s; }
+.card button.open-btn:hover { background: linear-gradient(90deg,#6366f1,#4f46e5); }
 .emoji-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:5px; max-height:150px; overflow:auto; margin-bottom:0.5rem; }
 .emoji-grid button { font-size:1.5rem; cursor:pointer; transition:0.2s; }
 .emoji-grid button:hover { transform:scale(1.2); }
@@ -43,8 +47,11 @@ body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100v
 <button id="addBtn" type="button" class="bg-white text-black rounded font-bold mt-2">➕ Ajouter</button>
 </div>
 
-<!-- GRILLE EMOJIS -->
-<div class="emoji-grid" id="emojiGrid"></div>
+<!-- MENU EMOJIS COLLAPSIBLE -->
+<div class="mb-2">
+  <button id="toggleEmoji" class="bg-white text-black px-2 py-1 rounded mb-1">😀 Emojis</button>
+  <div class="emoji-grid hidden" id="emojiGrid"></div>
+</div>
 
 <!-- FILTRES -->
 <div class="flex gap-2 mb-4">
@@ -60,9 +67,7 @@ body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100v
 </div>
 
 <script>
-// ==========================
 // THEME
-// ==========================
 let theme = localStorage.getItem("theme")||"dark";
 if(theme==="light") document.body.classList.add("light");
 document.getElementById("themeBtn").addEventListener("click", () => {
@@ -71,32 +76,21 @@ document.getElementById("themeBtn").addEventListener("click", () => {
     localStorage.setItem("theme", theme);
 });
 
-// ==========================
 // DONNÉES
-// ==========================
 let apps = JSON.parse(localStorage.getItem("hubApps")||"[]");
 
-// Applis natives
+// Natives simplifiées
 const nativeApps = [
   { name: "Google Drive", url: "https://drive.google.com", icon: "📂", cat: "Native", color: "#34d399" },
-  { name: "Google Docs", url: "https://docs.google.com", icon: "📄", cat: "Native", color: "#3b82f6" },
-  { name: "Google Classroom", url: "https://classroom.google.com", icon: "🎓", cat: "Native", color: "#facc15" },
-  { name: "Google Maps", url: "geo:0,0?q=", icon: "🗺️", cat: "Native", color: "#10b981" },
-  { name: "YouTube", url: "https://youtube.com", icon: "🎬", cat: "Native", color: "#ef4444" }
+  { name: "Google Docs", url: "https://docs.google.com", icon: "📄", cat: "Native", color: "#3b82f6" }
 ];
-// Ajouter natives si non présentes
 let added=false;
 nativeApps.forEach(n=>{
-  if(!apps.some(a=>a.name===n.name && a.cat==="Native")){
-    apps.push(n);
-    added=true;
-  }
+  if(!apps.some(a=>a.name===n.name && a.cat==="Native")){ apps.push(n); added=true; }
 });
 if(added) localStorage.setItem("hubApps", JSON.stringify(apps));
 
-// ==========================
 // EMOJIS
-// ==========================
 const emojis = ["🏃‍♂️","🏃‍♀️","⏱️","📂","📄","🎯","📚","🧭","🔢","⚡","📝","📷","🎵","🌟","🖊️","🗂️","📊","📌","📅","🛠️","🧩","🎒","📓","🗒️","🕹️","🛎️","🧰","🖍️","🎤","🏅","🥇","🥈","🥉","🗑️","💡","🧾","🔎","🔔","📍","🎫","🔗","🖥️","📲"];
 const emojiGrid=document.getElementById("emojiGrid");
 const iconInput=document.getElementById("icon");
@@ -107,22 +101,20 @@ emojis.forEach(e=>{
   btn.addEventListener("click", ()=>{ iconInput.value=e; iconInput.focus(); });
   emojiGrid.appendChild(btn);
 });
+document.getElementById("toggleEmoji").addEventListener("click", ()=>{
+  emojiGrid.classList.toggle("hidden");
+});
 
-// ==========================
 // AJOUT APP
-// ==========================
 document.getElementById("addBtn").addEventListener("click", ()=>{
     const name = document.getElementById("name").value.trim();
     const url = document.getElementById("url").value.trim();
     const cat = document.getElementById("cat").value.trim();
     const icon = iconInput.value || "🔗";
     const color = document.getElementById("color").value;
-
-    if(!name || !url){ alert("Nom et lien obligatoires"); return; }
-
+    if(!name||!url){ alert("Nom et lien obligatoires"); return; }
     apps.push({id:Date.now(), name, url, cat, icon, color, fav:false});
     localStorage.setItem("hubApps", JSON.stringify(apps));
-
     document.getElementById("name").value="";
     document.getElementById("url").value="";
     document.getElementById("cat").value="";
@@ -130,9 +122,7 @@ document.getElementById("addBtn").addEventListener("click", ()=>{
     render();
 });
 
-// ==========================
 // RENDER CARTES
-// ==========================
 let dragIndex=null;
 function render(){
     const list=document.getElementById("apps");
@@ -149,27 +139,25 @@ function render(){
       .sort((a,b)=>b.fav-a.fav)
       .forEach((a,i)=>{
         const card=document.createElement("div");
-        card.className="card p-4 rounded-xl shadow";
+        card.className="card p-4 shadow";
         card.draggable=true;
         card.style.background=a.color;
         card.ondragstart=()=>dragStart(i);
         card.ondragover=(e)=>e.preventDefault();
         card.ondrop=()=>drop(i);
 
-        // contenu
         card.innerHTML=`
-            <div class="text-3xl">${a.icon}</div>
-            <h2 class="text-xl font-bold">${a.name}</h2>
-            <p class="text-sm opacity-80">${a.cat||""}</p>
-            <div class="mt-2 flex gap-2">
-                <button class="open-btn bg-white text-black px-2 rounded">Ouvrir</button>
+            <div class="text-3xl mb-2">${a.icon}</div>
+            <h2 class="text-xl font-bold mb-1">${a.name}</h2>
+            <p class="text-sm opacity-80 mb-2">${a.cat||""}</p>
+            <div class="flex gap-2">
+                <button class="open-btn">Ouvrir</button>
                 <button class="fav-btn">⭐</button>
                 <button class="del-btn">🗑️</button>
             </div>
         `;
         list.appendChild(card);
 
-        // EVENTS boutons
         card.querySelector(".open-btn").addEventListener("click", ()=>window.open(a.url,"_blank"));
         card.querySelector(".fav-btn").addEventListener("click", ()=>{ a.fav^=1; localStorage.setItem("hubApps", JSON.stringify(apps)); render(); });
         card.querySelector(".del-btn").addEventListener("click", ()=>{
@@ -179,15 +167,11 @@ function render(){
     });
 }
 
-// ==========================
 // DRAG & DROP
-// ==========================
 function dragStart(i){dragIndex=i;}
 function drop(i){ if(dragIndex===null) return; const moved=apps.splice(dragIndex,1)[0]; apps.splice(i,0,moved); dragIndex=null; localStorage.setItem("hubApps", JSON.stringify(apps)); render(); }
 
-// ==========================
 // EXPORT / IMPORT
-// ==========================
 document.getElementById("exportBtn").addEventListener("click", ()=>{
     const blob=new Blob([JSON.stringify(apps)],{type:"application/json"});
     const a=document.createElement("a");
@@ -201,10 +185,18 @@ document.getElementById("importInput").addEventListener("change", e=>{
     r.readAsText(e.target.files[0]);
 });
 
-// ==========================
 // INITIAL RENDER
-// ==========================
 render();
+
+// ====================
+// SERVICE WORKER PWA
+// ====================
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./service-worker.js')
+  .then(()=>console.log("Service Worker OK"))
+  .catch(err=>console.log("Service Worker KO",err));
+}
 </script>
 </body>
 </html>
+
