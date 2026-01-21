@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hub Perso</title>
+
+<!-- Tailwind -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- PWA -->
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#2563eb">
+
+<style>
+:root { --bg1:#1e3a8a; --bg2:#2563eb; }
+.light { --bg1:#e0f2fe; --bg2:#bae6fd; }
+body{
+  background:linear-gradient(135deg,var(--bg1),var(--bg2));
+  min-height:100vh;
+  color:white;
+}
+.card{transition:.2s}
+.card:hover{transform:scale(1.03)}
+</style>
+</head>
+
+<body class="p-4">
+
+<header class="text-center mb-4">
+<h1 class="text-4xl font-bold">📂 Hub Perso</h1>
+<p class="opacity-80">Centralisation simple – tablette Android</p>
+</header>
+
+<!-- CONTROLES -->
+<div class="flex flex-wrap gap-2 justify-center mb-4">
+<button onclick="toggleTheme()" class="bg-white text-black px-3 py-1 rounded">🌗 Thème</button>
+<button onclick="exportData()" class="bg-white text-black px-3 py-1 rounded">📤 Export</button>
+<label class="bg-white text-black px-3 py-1 rounded cursor-pointer">
+📥 Import<input type="file" hidden onchange="importData(event)">
+</label>
+</div>
+
+<!-- AJOUT -->
+<div class="grid sm:grid-cols-6 gap-2 mb-4">
+<input id="name" placeholder="Nom" class="p-2 rounded text-black">
+<input id="url" placeholder="Lien" class="p-2 rounded text-black">
+<input id="cat" placeholder="Catégorie" class="p-2 rounded text-black">
+<input id="icon" placeholder="Emoji 😀" class="p-2 rounded text-black">
+<input id="color" type="color" value="#4f46e5" class="h-10">
+<button onclick="addApp()" class="bg-white text-black rounded font-bold">➕ Ajouter</button>
+</div>
+
+<!-- FILTRES -->
+<div class="flex gap-2 mb-4">
+<input id="search" placeholder="🔍 Rechercher" class="flex-1 p-2 rounded text-black" oninput="render()">
+<select id="filterCat" onchange="render()" class="p-2 rounded text-black">
+<option value="">Toutes catégories</option>
+</select>
+</div>
+
+<!-- CARTES -->
+<div id="apps" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+
+<script>
+let apps = JSON.parse(localStorage.getItem("hubApps")||"[]");
+let theme = localStorage.getItem("theme")||"dark";
+let dragIndex=null;
+
+if(theme==="light") document.body.classList.add("light");
+
+function save(){
+ localStorage.setItem("hubApps",JSON.stringify(apps));
+ render();
+}
+
+function toggleTheme(){
+ theme=theme==="dark"?"light":"dark";
+ document.body.classList.toggle("light");
+ localStorage.setItem("theme",theme);
+}
+
+function addApp(){
+ const app={
+  id:Date.now(),
+  name:name.value.trim(),
+  url:url.value.trim(),
+  cat:cat.value.trim(),
+  icon:icon.value||"🔗",
+  color:color.value,
+  fav:false
+ };
+ if(!app.name||!app.url) return alert("Nom et lien obligatoires");
+ apps.push(app);
+ save();
+ name.value=url.value=cat.value=icon.value="";
+}
+
+function del(id){
+ if(confirm("Supprimer cette appli ?")){
+  apps=apps.filter(a=>a.id!==id);
+  save();
+ }
+}
+
+function fav(id){
+ apps.find(a=>a.id===id).fav^=1;
+ save();
+}
+
+function openApp(a){
+ window.open(a.url,"_blank");
+}
+
+function dragStart(i){dragIndex=i;}
+function dragOver(e){e.preventDefault();}
+function drop(i){
+ if(dragIndex===null) return;
+ const moved=apps.splice(dragIndex,1)[0];
+ apps.splice(i,0,moved);
+ dragIndex=null;
+ save();
+}
+
+function render(){
+ const list=document.getElementById("apps");
+ const cats=[...new Set(apps.map(a=>a.cat).filter(Boolean))];
+ filterCat.innerHTML='<option value="">Toutes catégories</option>'+
+ cats.map(c=>`<option>${c}</option>`).join("");
+
+ let filtered=apps
+  .filter(a=>a.name.toLowerCase().includes(search.value.toLowerCase()))
+  .filter(a=>!filterCat.value||a.cat===filterCat.value)
+  .sort((a,b)=>b.fav-a.fav);
+
+ list.innerHTML="";
+ filtered.forEach((a,i)=>{
+  list.innerHTML+=`
+  <div class="card p-4 rounded-xl shadow"
+   draggable="true"
+   ondragstart="dragStart(${i})"
+   ondragover="dragOver(event)"
+   ondrop="drop(${i})"
+   style="background:${a.color}">
+   <div class="text-3xl">${a.icon}</div>
+   <h2 class="text-xl font-bold">${a.name}</h2>
+   <p class="text-sm opacity-80">${a.cat||""}</p>
+   <div class="mt-2 flex gap-2">
+    <button onclick='openApp(${JSON.stringify(a)})' class="bg-white text-black px-2 rounded">Ouvrir</button>
+    <button onclick="fav(${a.id})">⭐</button>
+    <button onclick="del(${a.id})">🗑️</button>
+   </div>
+  </div>`;
+ });
+}
+render();
+
+// PWA
+if("serviceWorker" in navigator){
+ navigator.serviceWorker.register("./service-worker.js");
+}
+
+function exportData(){
+ const blob=new Blob([JSON.stringify(apps)],{type:"application/json"});
+ const a=document.createElement("a");
+ a.href=URL.createObjectURL(blob);
+ a.download="hub-backup.json";
+ a.click();
+}
+
+function importData(e){
+ const r=new FileReader();
+ r.onload=()=>{apps=JSON.parse(r.result);save();}
+ r.readAsText(e.target.files[0]);
+}
+</script>
+
+</body>
+</html>
