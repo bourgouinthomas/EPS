@@ -1,4 +1,4 @@
-/* Dark mode global */
+/* === BODY GLOBAL === */
 body {
   background-color: #121212;
   color: #E0E0E0;
@@ -7,29 +7,29 @@ body {
   padding: 0;
 }
 
-/* Navbar / header */
+/* === NAVBAR STICKY === */
 header, nav {
   position: sticky;
   top: 0;
+  z-index: 100;
   background-color: #1E1E1E;
-  padding: 1rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding: 1rem 2rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.6);
-  z-index: 100;
 }
 
 header h1, nav h1 {
+  color: #E0E0E0;
   font-size: 1.8rem;
   margin: 0;
-  color: #E0E0E0;
 }
 
-/* Boutons principaux */
-button, .btn {
+/* Bouton principal dans navbar */
+header button, nav button, .btn-main {
   background-color: #4FA1F2;
-  color: #FFF;
+  color: #fff;
   border: none;
   padding: 0.6rem 1.2rem;
   border-radius: 6px;
@@ -38,23 +38,23 @@ button, .btn {
   transition: all 0.2s ease;
 }
 
-button:hover, .btn:hover {
+header button:hover, nav button:hover, .btn-main:hover {
   background-color: #3A8CD4;
   transform: translateY(-1px);
 }
 
-/* Conteneur principal */
+/* === CONTENEUR PRINCIPAL === */
 main, .container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem 1rem;
   display: flex;
   flex-wrap: wrap;
-  justify-content: center;
   gap: 1rem;
+  justify-content: center;
 }
 
-/* Cartes / items */
+/* === CARTES === */
 .card, .item {
   background-color: #1E1E1E;
   border-radius: 12px;
@@ -62,6 +62,9 @@ main, .container {
   box-shadow: 0 6px 12px rgba(0,0,0,0.4);
   flex: 1 1 250px;
   max-width: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -70,8 +73,8 @@ main, .container {
   box-shadow: 0 10px 18px rgba(0,0,0,0.5);
 }
 
-/* Titres et textes */
-h2, h3 {
+/* === TITRES ET TEXTES === */
+h2, h3, h4 {
   margin: 0 0 0.5rem 0;
   color: #E0E0E0;
 }
@@ -80,7 +83,25 @@ p, span, li {
   color: #A0A0A0;
 }
 
-/* Listes / tableaux */
+/* === BOUTONS SUR LES CARTES === */
+.card .btn, .item .btn {
+  align-self: flex-end;
+  background-color: #4FA1F2;
+  color: #fff;
+  border: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.card .btn:hover, .item .btn:hover {
+  background-color: #3A8CD4;
+  transform: translateY(-1px);
+}
+
+/* === LISTES / TABLEAUX === */
 ul, ol, table {
   background-color: #1E1E1E;
   border-radius: 8px;
@@ -88,7 +109,7 @@ ul, ol, table {
   color: #E0E0E0;
 }
 
-/* Input / formulaires */
+/* === INPUT / FORMULAIRES === */
 input, select, textarea {
   background-color: #1E1E1E;
   color: #E0E0E0;
@@ -105,7 +126,7 @@ input:focus, select:focus, textarea:focus {
   outline: none;
 }
 
-/* Responsive */
+/* === RESPONSIVE === */
 @media (max-width: 768px) {
   main, .container {
     flex-direction: column;
