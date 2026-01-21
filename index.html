@@ -9,13 +9,15 @@
 :root { --bg1:#1e3a8a; --bg2:#2563eb; }
 .light { --bg1:#e0f2fe; --bg2:#bae6fd; }
 body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100vh;color:white; }
-.card { transition:.2s; }
-.card:hover { transform:scale(1.03); }
-.emoji-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:5px; max-height:150px; overflow:auto; margin-bottom:0.5rem;}
-.emoji-grid button { font-size:1.5rem; }
+.card { transition:.2s; cursor:grab; }
+.card:hover { transform:scale(1.03); box-shadow:0 0 15px rgba(0,0,0,0.4); }
+.emoji-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(40px,1fr)); gap:5px; max-height:150px; overflow:auto; margin-bottom:0.5rem; }
+.emoji-grid button { font-size:1.5rem; cursor:pointer; transition:0.2s; }
+.emoji-grid button:hover { transform:scale(1.2); }
 </style>
 </head>
 <body class="p-4">
+<div class="max-w-[1200px] mx-auto">
 
 <header class="text-center mb-4">
 <h1 class="text-4xl font-bold">EPS</h1>
@@ -36,7 +38,7 @@ body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100v
 <input id="name" placeholder="Nom" class="p-2 rounded text-black">
 <input id="url" placeholder="Lien" class="p-2 rounded text-black">
 <input id="cat" placeholder="Catégorie" class="p-2 rounded text-black">
-<input id="icon" placeholder="Emoji" class="p-2 rounded text-black">
+<input id="icon" placeholder="Emoji" class="p-2 rounded text-black" readonly>
 <input id="color" type="color" value="#4f46e5" class="h-10">
 <button id="addBtn" class="bg-white text-black rounded font-bold">➕ Ajouter</button>
 </div>
@@ -53,16 +55,23 @@ body { background:linear-gradient(135deg,var(--bg1),var(--bg2)); min-height:100v
 </div>
 
 <!-- CARTES -->
-<div id="apps" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+<div id="apps" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
+
+</div>
 
 <script>
+// DONNÉES
 let apps = JSON.parse(localStorage.getItem("hubApps")||"[]");
 let theme = localStorage.getItem("theme")||"dark";
 let dragIndex=null;
 
 // THEME
 if(theme==="light") document.body.classList.add("light");
-function toggleTheme(){ theme=theme==="dark"?"light":"dark"; document.body.classList.toggle("light"); localStorage.setItem("theme",theme); }
+function toggleTheme(){ 
+  theme=theme==="dark"?"light":"dark"; 
+  document.body.classList.toggle("light"); 
+  localStorage.setItem("theme",theme); 
+}
 
 // EMOJIS
 const emojis = ["🏃‍♂️","🏃‍♀️","⏱️","📂","📄","🎯","📚","🧭","🔢","⚡","📝","📷","🎵","🌟","🖊️","🗂️","📊","📌","📅","🛠️","🧩","🎒","📓","🗒️","🕹️","🛎️","🧰","🖍️","🎤","🏅","🥇","🥈","🥉","🗑️","💡","🧾","🔎","🔔","📍","🎫","🔗","🖥️","📲"];
@@ -72,6 +81,19 @@ emojis.forEach(e=>{
   btn.innerText=e;
   btn.onclick=()=>document.getElementById("icon").value=e;
   emojiGrid.appendChild(btn);
+});
+
+// APPLIS NATIVES ANDROID
+const nativeApps = [
+  { name: "Google Drive", url: "https://drive.google.com", icon: "📂", cat: "Native", color: "#34d399" },
+  { name: "Google Docs", url: "https://docs.google.com", icon: "📄", cat: "Native", color: "#3b82f6" },
+  { name: "Google Classroom", url: "https://classroom.google.com", icon: "🎓", cat: "Native", color: "#facc15" },
+  { name: "Google Maps", url: "geo:0,0?q=", icon: "🗺️", cat: "Native", color: "#10b981" },
+  { name: "YouTube", url: "https://youtube.com", icon: "🎬", cat: "Native", color: "#ef4444" }
+];
+// Ajoute seulement si pas déjà présent
+nativeApps.forEach(n=>{
+  if(!apps.some(a=>a.name===n.name && a.cat==="Native")) apps.push(n);
 });
 
 // SAUVEGARDE
@@ -103,7 +125,11 @@ function addApp(){
 document.getElementById("addBtn").addEventListener("click", addApp);
 
 // SUPPRIMER / FAVORI / OUVRIR
-function del(id){ if(confirm("Supprimer ?")){ apps=apps.filter(a=>a.id!==id); save(); } }
+function del(id){ 
+  const app = apps.find(a=>a.id===id);
+  if(app.cat==="Native"){ alert("Impossible de supprimer une appli native"); return; }
+  if(confirm("Supprimer ?")){ apps=apps.filter(a=>a.id!==id); save(); } 
+}
 function fav(id){ apps.find(a=>a.id===id).fav^=1; save(); }
 function openApp(a){ window.open(a.url,"_blank"); }
 
@@ -151,7 +177,7 @@ if("serviceWorker" in navigator){ navigator.serviceWorker.register("./service-wo
 // EXPORT / IMPORT
 function exportData(){ const blob=new Blob([JSON.stringify(apps)],{type:"application/json"}); const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download="hub-backup.json"; a.click(); }
 function importData(e){ const r=new FileReader(); r.onload=()=>{apps=JSON.parse(r.result);save();} r.readAsText(e.target.files[0]); }
-</script>
 
+</script>
 </body>
 </html>
